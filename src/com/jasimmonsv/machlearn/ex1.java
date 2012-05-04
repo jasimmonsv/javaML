@@ -7,6 +7,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import com.panayotis.gnuplot.*;
+import com.panayotis.gnuplot.layout.StripeLayout;
+import com.panayotis.gnuplot.plot.AbstractPlot;
+import com.panayotis.gnuplot.plot.DataSetPlot;
+import com.panayotis.gnuplot.style.NamedPlotColor;
+import com.panayotis.gnuplot.style.PlotStyle;
+import com.panayotis.gnuplot.style.Style;
+import com.panayotis.iodebug.Debug;
 
 import Jama.*;
 
@@ -36,18 +44,25 @@ public class ex1 {
 		}//end try-catch
 		// PART 2: Plotting************************************************************
 		System.out.println("Plotting Data...(Not utilized)");
+		
 		//TODO add filepath arguement
 		//TODO read in test data ex1data1.txt
 		openFile(filePath);
 		readRecords();
 		closeFile();
 		double[][] matX = new double[m][1];//init X vector
+		double [][] matY = new double[m][1];//init y vector
 		double[] y = new double[m];//init Y vector
 		for (int i = 0;i<m;i++){
 			matX[i][0] = data[i][0]; //build X vector from data matrix
+			matY[i][0] = data[i][1]; //build X vector from data matrix
 			y[i] = data[i][1]; //build Y vector from data matrix
 		}//end for
+		X = new Matrix(matX);
+		
+		Matrix Y = new Matrix(matY);
 		//TODO Plotting ex1
+		plotData(X, Y);
 		System.out.println("Paused....");
 		try {
 			System.in.read();
@@ -56,9 +71,8 @@ public class ex1 {
 		}//end try-catch
 		// PART 3 Gradiant Decent ************************************************************
 		System.out.println("Gradiant Decent...(building)");
-		X = new Matrix(matX);
-		Matrix ones = new Matrix(m, 1, 1);
-		X.addRow(ones,':');
+		
+		X.addRow(new Matrix(m, 1, 1),':');
 		theta = new Matrix(2,1,0);
 		//Some gradiant descent settings
 		int iterations = 1500;
@@ -192,6 +206,50 @@ public class ex1 {
 		return retMat;
 	}//end method ones
 	
+	private static void plotData(Matrix x ,Matrix y){
+		 JavaPlot p = new JavaPlot();
+	     //JavaPlot.getDebugger().setLevel(Debug.VERBOSE);
+	        
+	     p.setTitle("Default Terminal Title");
+	     p.getAxis("x").setLabel("X axis", "Arial", 20);
+	     p.getAxis("y").setLabel("Y axis");
+
+	     p.getAxis("x").setBoundaries(5, 25);
+	     p.getAxis("y").setBoundaries(-5, 25);
+	     p.setKey(JavaPlot.Key.TOP_RIGHT);
+	     double[][] plot = new double[x.getRowDimension()][2];
+	     for (int i=0;i<m;i++){
+	    	 plot[i][0]= x.get(i, 0);
+	     }
+	     for (int i=0;i<m;i++){
+	    	 plot[i][1]= y.get(i, 0);
+	     }
+	     DataSetPlot s = new DataSetPlot(plot);
+	     p.addPlot(x.getArray());
+	    /** PlotStyle stl = ((AbstractPlot) p.getPlots().get(1)).getPlotStyle();
+	     stl.setStyle(Style.POINTS);
+	     stl.setLineType(NamedPlotColor.GOLDENROD);
+	     stl.setPointType(5);
+	     stl.setPointSize(8);*/
+	     //p.addPlot("sin(x)");
+
+	   
+	     StripeLayout lo = new StripeLayout();
+	     lo.setColumns(9999);
+	     p.getPage().setLayout(lo);
+	     p.plot();
+        
+	}//end method plotData
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param theta
+	 * @param alpha
+	 * @param iterations
+	 * @rwturn
+	 */
 	private static Matrix gradientDescent(Matrix x, double[] y, Matrix theta,
 			double alpha, int iterations) {
 		J_history = new float[iterations]; 
