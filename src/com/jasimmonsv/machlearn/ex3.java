@@ -9,14 +9,21 @@
  */
 package com.jasimmonsv.machlearn;
 
+import java.applet.Applet;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.lang.Math;
-import Jama.Matrix;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import com.jasimmonsv.Jama.Matrix;
 import com.panayotis.gnuplot.*;
 import com.panayotis.gnuplot.plot.AbstractPlot;
 import com.panayotis.gnuplot.plot.DataSetPlot;
@@ -24,7 +31,7 @@ import com.panayotis.gnuplot.style.NamedPlotColor;
 import com.panayotis.gnuplot.style.PlotStyle;
 import com.panayotis.gnuplot.style.Style;
 
-public class ex3 {
+public class ex3 extends Applet{
 	private static Scanner input; //class variable that holds file pointer
 	//private int input_layer_size  = 400;  //20x20 Input Images of Digits
 	//private int hidden_layer_size = 25;   // 25 hidden units
@@ -36,6 +43,16 @@ public class ex3 {
 	private static int n=0;//how many columns in the test data
 	private static Matrix Theta1; //Thetas for NN training
 	private static Matrix Theta2; //Thetas for NN training
+	private static JFrame aFrame = new JFrame("NN Display");
+	private static Component a = new ex3();
+	private static int m1; //how many rows in array
+	private static int n1; //how many cols in array
+	private static int example_width;//how wide the numbers are going to be
+	private static int example_height; //how tall the numbers are going to be
+	private static int display_rows; //define how many rows of numbers to display
+	private static int display_cols; //define how many cols of numbers to display
+	private static int pad = 1; //padding between border and numbers
+	private static double[][] display_array;
 	
 	/**
 	 * @param args not used
@@ -43,24 +60,20 @@ public class ex3 {
 	public static void main(String[] args) {
 		//===========================Part 1: Loading and visualizing data ===========================
 		//Load Training data
-		System.out.println("Loading and Visualizing Data ...\n");
-		//Randomly select 100 data points to display
+		System.out.println("Loading and Visualizing Data ...");
+		//open file and load data into memory
 		openFile("./ex3data1.txt");
 		readRecords();
-		//displayData(randomArray(xData,50));//**************Define how many numbers to display
 		
-		System.out.println("Paused....Press Enter to Continue");
-		try {
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}//end try-catch
+		//testDisplayData(xData[20]);
+		//displayData(randomArray(xData,50));//**************Define how many numbers to display
 		
 		/**In this part of the exercise, we load some pre-initialized 
 		% neural network parameters.
 		//================ Part 2: Loading Pameters ================
 		*/
 		System.out.println("Loading Saved Neural Network Parameters ...");
+		//load theta data and save into memory
 		openFile("./ex3weights.txt");//Theta1=>25x401 Theta2=>10x26
 		readThetas();
 		
@@ -77,8 +90,8 @@ public class ex3 {
 			vars[i][0]=pred[i][0];
 			num[i][0]=pred[i][1];
 		}//end for
-		System.out.println("Training Set Accuracy: "+ matrixMean(compare(new Matrix(num),yData)) * 100);//TODO fix this call
 		
+		System.out.println("Training Set Accuracy: "+ matrixMean(compare(new Matrix(num),yData)) * 100);
 		System.out.println("Paused....Press Enter to Continue");
 		try {
 			System.in.read();
@@ -88,34 +101,46 @@ public class ex3 {
 		
 		//TODO Finish this last part
 		//%  Randomly permute examples
-
-		for (int i = 0;i<100;i++){//chage for iterations
-			
-    	//Display 
-    		System.out.println("Displaying Example Image");
+		int count=0;
+		int iterations=100000;
+		Long startTime = System.currentTimeMillis();
+		for (int i = 0;i<iterations;i++){//chage for iterations
+			 
+    		//System.out.println("Displaying Example Image");
     		int rp = (int)(Math.random() *xData.length);
-    		//displayData(xData[rp]);
 
-    		pred = predict(Theta1, Theta2, xData[rp]);
-    		vars=new double[pred.length][1];
-    		num=new double[pred.length][1];
-    		for(int k=0;k<pred.length;k++){
-    			vars[k][0]=pred[k][0];
-    			num[k][0]=pred[k][1];
-    		}//end for
-    		System.out.println("Neural Network Prediction: "+ vars[0][0]*100+"% probability of "+num[0][0] +" (digit "+ yData.get(rp, 0)+")");//, mod(pred, 10));//TODO add Mod
-    
+    		pred = predict(Theta1, Theta2, xData[rp]);//returns array of guess
+    		vars=new double[pred.length][1];//percentage guess
+    		num=new double[pred.length][1];//position within answer array
+    		vars[0][0]=pred[0][0];
+    		num[0][0]=pred[0][1];
+    		
+    		/** This block for high iteration error display only**************
+    		if (num[0][0]!=yData.get(rp, 0)){
+    			//System.out.println(count+": "+ vars[0][0]*100+"% "+num[0][0] +" (digit "+ yData.get(rp, 0)+")");
+    			count++;
+    		}//end if
+    		//    *************END high iteration error display block  */ 
+    		//** This block for normal operations *****************************
+    		displayData(xData[rp]);
+    		System.out.println(count+": "+ vars[0][0]*100+"% "+num[0][0] +" (digit "+ yData.get(rp, 0)+")");
+    		
     		// Pause after every result
     		System.out.println("Paused....Press Enter to Continue");
     		try {
     			System.in.read();
     		} catch (IOException e) {
     			e.printStackTrace();
-    		}//end try-catch
+    		}//end try-catch*/
+    		//    *************END normal iteration error display block  */ 
     		
 		}//end for
 		// Pause
-		System.out.println("Paused....Press Enter to Continue");
+		Long endTime = System.currentTimeMillis();
+		double elapsedTime = (endTime-startTime)/1000;
+		System.out.println("Time elapsed: "+elapsedTime+" seconds");
+		System.out.println(iterations/elapsedTime+" digits/sec");
+		System.out.println("End of Program....Press Enter to Continue. Error Count: "+count);
 		try {
 			System.in.read();
 		} catch (IOException e) {
@@ -297,6 +322,78 @@ public class ex3 {
 		for (int j = 0;j < yTemp.size();j++) yData.set(j, 0, yTemp.get(j));
 	}//end method readRecords
 	
+	private static void testDisplayData(double[] X){
+		
+		 //Var declerations
+		
+		//define new m and n for smaller x array
+		int m1 = 1; //how many rows in array
+		int n1 = X.length; //how many cols in array
+		int example_width = (int) Math.sqrt(n1);//how wide the numbers are going to be
+		int example_height = (int) n1/ example_width; //how tall the numbers are going to be
+		int display_rows = (int) Math.floor(Math.sqrt(m1)); //define how many rows of numbers to display
+		int display_cols = (int) Math.ceil(m1/display_rows); //define how many cols of numbers to display
+		int pad = 1; //padding between border and numbers
+		int curr_ex = 0; //counter for which handwritten number we are on
+		
+		//create a new frame to which we will add a canvas
+	    
+	    
+	    ex3.aFrame.setSize(300,300);
+	    ex3.aFrame.getContentPane().add(a, BorderLayout.CENTER);
+	    //ex3.aFrame.setSize(display_rows*example_width, display_cols*example_height);
+	    ex3.aFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    
+			
+		//build display_array
+		double[][] display_array = new double[pad + display_rows * (example_height + pad)][pad + display_cols * (example_width + pad)];
+			
+		//init display_array to -1
+		for(int i=0;i<display_array.length;i++){
+			for(int j=0;j<display_array[0].length;j++)display_array[i][j]=-1;
+		}//end outer loop
+			
+		double[][] tempX = new double[example_height][example_width];//temp matrix for reshaping
+		for (int j = 1; j < display_rows+1;j++){ //one row at a time
+			for (int i = 1; i< display_cols+1;i++){  //every column in the given row
+				if (curr_ex > m1) break;//extra check for outofarraybounds 
+				//Copy the patch
+				//Get the max value of the patch
+				tempX = reshape(X,example_height,example_width);
+				int max_val = maxValue(X);//get max value for row "curr_ex"
+				//Save new matrix into its allowed display_array matrix
+				for (int k=0;k<example_height;k++){
+					for (int l=0;l<example_width;l++){
+						display_array[pad + (j - 1) * (example_height + pad) + (k)][pad + (i - 1) * (example_width + pad) + (l)] = tempX[k][l];//makes sense
+					}//end inner for loop
+				}//end outer for loop
+				curr_ex++;//next area of display
+			}//end inner for loop
+			if (curr_ex > m1) break; //extra check for outofarraybounds
+		}//end outer for loop
+			
+		//uses gnujavaplot to display results
+			
+	     //add the canvas
+	     aFrame.setVisible(true);
+		
+	}//end testDisplayData
+	
+	
+	public void paint(Graphics g){
+		
+		for (int x=0;x<display_array.length;x++){
+			for (int y=0;y<display_array[0].length;y++){
+				int rgb = (int) (125.5*display_array[x][y]+124);
+				if (rgb > 254)rgb=254;
+				else if (rgb<0)rgb=0;
+				g.setColor(new Color(rgb,rgb,rgb));
+				g.fillRect(x+30, y+30, 30, 30);
+				g.setColor(Color.red);
+			}//end inner loop
+		}//end outer loop
+	}//end method paint
+
 	/**
 	 * 
 	 * @param X the matrix to display image data from
@@ -304,16 +401,15 @@ public class ex3 {
 	 * 
 	 */
 	private static void displayData(double[][] X){
-		//Var declerations
 		
 		//define new m and n for smaller x array
-		int m1 = X.length; //how many rows in array
-		int n1 = X[0].length; //how many cols in array
-		int example_width = (int) Math.sqrt(n);//how wide the numbers are going to be
-		int example_height = (int) n1/ example_width; //how tall the numbers are going to be
-		int display_rows = (int) Math.floor(Math.sqrt(m1)); //define how many rows of numbers to display
-		int display_cols = (int) Math.ceil(m1/display_rows); //define how many cols of numbers to display
-		int pad = 1; //padding between border and numbers
+		m1 = X.length; //how many rows in array
+		n1 = X[0].length; //how many cols in array
+		example_width = (int) Math.sqrt(n);//how wide the numbers are going to be
+		example_height = (int) n1/ example_width; //how tall the numbers are going to be
+		display_rows = (int) Math.floor(Math.sqrt(m1)); //define how many rows of numbers to display
+		display_cols = (int) Math.ceil(m1/display_rows); //define how many cols of numbers to display
+		pad = 1; //padding between border and numbers
 		int curr_ex = 0; //counter for which handwritten number we are on
 		
 		//build display_array
@@ -329,9 +425,11 @@ public class ex3 {
 			for (int i = 1; i< display_cols;i++){  //every column in the given row
 					if (curr_ex > m1) break;//extra check for outofarraybounds 
 					//Copy the patch
-					//Get the max value of the patch
 					tempX = reshape(X[curr_ex],example_height,example_width);
+					
+					//Get the max value of the patch
 					//int max_val = maxValue(X[curr_ex]);//get max value for row "curr_ex"
+					
 					//Save new matrix into its allowed display_array matrix
 					for (int k=0;k<example_height;k++){
 						for (int l=0;l<example_width;l++){
@@ -345,32 +443,9 @@ public class ex3 {
 		
 		//uses gnujavaplot to display results
 		//TODO fix the grayscale shading, or replace with better display module
-		JavaPlot p = new JavaPlot();
-        p.getAxis("x").setBoundaries(0, display_array.length);
-        p.getAxis("y").setBoundaries(-display_array[0].length,0);
+		
  
-        int count = 0;
-        int[][] points = new int[20000][2];
-        for (int x =0;x<display_array.length;x++){
-        	for (int y = 0;y<display_array[0].length;y++){
-        		if(Math.abs(display_array[x][y])>0){
-        			points[count][0] = x;
-        			points[count][1]=-y;
-        			count++;
-        		}//end if
-        	}//end inner for loop
-        }//end outer for loop
-        DataSetPlot s = new DataSetPlot(points);
-        p.addPlot(s);
-        //define style of graph
-        PlotStyle stl = ((AbstractPlot) p.getPlots().get(0)).getPlotStyle();
-        stl.setStyle(Style.POINTS);
-        stl.setLineType(NamedPlotColor.GRAY);
-        stl.setPointType(2);
-        stl.setPointSize(1);
-        
-        //display graph
-        p.plot();
+        //***************Drawing the display
        
 	}//end method displayData
 	
@@ -382,19 +457,25 @@ public class ex3 {
 	 */
 	private static void displayData(double[] X){
 		//Var declerations
-		
+	    
 		//define new m and n for smaller x array
-		int m1 = 1; //how many rows in array
-		int n1 = X.length; //how many cols in array
-		int example_width = (int) Math.sqrt(n);//how wide the numbers are going to be
-		int example_height = (int) n1/ example_width; //how tall the numbers are going to be
-		int display_rows = (int) Math.floor(Math.sqrt(m1)); //define how many rows of numbers to display
-		int display_cols = (int) Math.ceil(m1/display_rows); //define how many cols of numbers to display
-		int pad = 1; //padding between border and numbers
+		m1 = 1; //how many rows in array
+		n1 = X.length; //how many cols in array
+		example_width = (int) Math.sqrt(n1);//how wide the numbers are going to be
+		example_height = (int) n1/ example_width; //how tall the numbers are going to be
+		display_rows = (int) Math.floor(Math.sqrt(m1)); //define how many rows of numbers to display
+		display_cols = (int) Math.ceil(m1/display_rows); //define how many cols of numbers to display
 		int curr_ex = 0; //counter for which handwritten number we are on
 		
+	    aFrame.setSize(display_rows*example_width*10, display_cols*example_height*10);
+	    aFrame.getContentPane().setSize(1000, 1000);
+	    aFrame.getContentPane().add(a, BorderLayout.CENTER);
+	    aFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    a.setSize(display_rows*example_width*10, display_cols*example_height*10);
+	    aFrame.setAlwaysOnTop(true);
+	    
 		//build display_array
-		double[][] display_array = new double[pad + display_rows * (example_height + pad)][pad + display_cols * (example_width + pad)];
+		display_array = new double[pad + display_rows * (example_height + pad)][pad + display_cols * (example_width + pad)];
 		
 		//init display_array to -1
 		for(int i=0;i<display_array.length;i++){
@@ -406,51 +487,31 @@ public class ex3 {
 			for (int i = 1; i< display_cols+1;i++){  //every column in the given row
 					if (curr_ex > m1) break;//extra check for outofarraybounds 
 					//Copy the patch
-					//Get the max value of the patch
+					
+					//Convert a row of the data matrix into a width x height grayscale image
 					tempX = reshape(X,example_height,example_width);
 					int max_val = maxValue(X);//get max value for row "curr_ex"
+					
 					//Save new matrix into its allowed display_array matrix
 					for (int k=0;k<example_height;k++){
 						for (int l=0;l<example_width;l++){
-							display_array[pad + (j - 1) * (example_height + pad) + (k)][pad + (i - 1) * (example_width + pad) + (l)] = tempX[k][l];//makes sense
+							display_array[pad + (j - 1) * (example_height + pad) + (k)]
+										 [pad + (i - 1) * (example_width + pad) + (l)] = 
+										 tempX[k][l]/max_val;//makes sense
 						}//end inner for loop
 					}//end outer for loop
 					curr_ex++;//next area of display
+					
 			}//end inner for loop
 				if (curr_ex > m1) break; //extra check for outofarraybounds
 		}//end outer for loop
 		
-		//uses gnujavaplot to display results
 		//TODO fix the grayscale shading, or replace with better display module
-		JavaPlot p = new JavaPlot();
-        p.getAxis("x").setBoundaries(0, display_array.length);
-        p.getAxis("y").setBoundaries(-display_array[0].length,0);
- 
-        int count = 0;
-        int[][] points = new int[20000][2];
-        for (int x =0;x<display_array.length;x++){
-        	for (int y = 0;y<display_array[0].length;y++){
-        		if(Math.abs(display_array[x][y])>0){
-        			points[count][0] = x;
-        			points[count][1]=-y;
-        			count++;
-        		}//end if
-        	}//end inner for loop
-        }//end outer for loop
-        DataSetPlot s = new DataSetPlot(points);
-        p.addPlot(s);
-        //define style of graph
-        PlotStyle stl = ((AbstractPlot) p.getPlots().get(0)).getPlotStyle();
-        stl.setStyle(Style.POINTS);
-        stl.setLineType(NamedPlotColor.GRAY);
-        stl.setPointType(1);
-        stl.setPointSize(1);
+		aFrame.setVisible(true);
+		ex3.aFrame.repaint();
         
-        //display graph
-        p.plot();
-       
 	}//end method displayData
-	
+
 	/**
 	 * This method will return the largest value of an array out of a vector
 	 * 

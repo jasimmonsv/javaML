@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+
+import com.jasimmonsv.Jama.*;
 import com.panayotis.gnuplot.*;
 import com.panayotis.gnuplot.layout.StripeLayout;
 import com.panayotis.gnuplot.plot.AbstractPlot;
@@ -16,7 +18,6 @@ import com.panayotis.gnuplot.style.PlotStyle;
 import com.panayotis.gnuplot.style.Style;
 import com.panayotis.iodebug.Debug;
 
-import Jama.*;
 
 public class ex1 {
 	private static String filePath = "./ex1data1.txt"; //default filepath where data is held
@@ -100,7 +101,8 @@ public class ex1 {
 	 * @return identity matrix
 	 */
 	private static Matrix eye(int x){
-		Matrix rtnMatrix = Matrix.identity(x,x);
+		Matrix rtnMatrix = new Matrix(x,x);
+		rtnMatrix.identity(x, x);
 		return rtnMatrix;
 	}//end method eye
 
