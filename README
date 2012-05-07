@@ -1,4 +1,4 @@
 @Author J.A. Simmons V
 @Author_website www.jasimmonsv.com
 
-This project is my attempt to impliment the exercises from Stanford's Machine Learning public online class in Java. This project uses JAMA as the matrix library (http://math.nist.gov/javanumerics/jama/) with some additional code I had to implement, which I will upload at a later time.
+This project is my attempt to impliment the exercises from Stanford's Machine Learning public online class in Java. This project uses JAMA as the matrix library (http://math.nist.gov/javanumerics/jama/) with some additional code I had to implement. My JAMA implementation can be found at https://github.com/jasimmonsv/JAMA
