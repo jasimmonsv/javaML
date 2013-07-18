@@ -15,21 +15,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.lang.Math;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import com.jasimmonsv.Jama.Matrix;
-import com.panayotis.gnuplot.*;
-import com.panayotis.gnuplot.plot.AbstractPlot;
-import com.panayotis.gnuplot.plot.DataSetPlot;
-import com.panayotis.gnuplot.style.NamedPlotColor;
-import com.panayotis.gnuplot.style.PlotStyle;
-import com.panayotis.gnuplot.style.Style;
 
 public class ex3 extends Applet{
 	private static Scanner input; //class variable that holds file pointer
@@ -148,58 +139,6 @@ public class ex3 extends Applet{
 		}//end try-catch
 	}//end method main
 	
-	private static void readThetas() {
-		int matrixRows = 5000;
-		int matrixCols = 400;
-		String temp1 = new String();
-		ArrayList<Double> t1Temp = new ArrayList<Double>();
-		ArrayList<Double> t2Temp = new ArrayList<Double>();
-		try {
-			while (input.hasNext() ){
-				temp1 = input.next().toString();
-				if (temp1.matches("theta2"))break;
-				t1Temp.add(Double.valueOf(temp1));
-			}//end while
-			while (input.hasNext() ){
-				t2Temp.add(Double.valueOf(input.next().toString()));
-			}//end while
-		}//end try
-		catch(NoSuchElementException elementException){
-			System.err.println( "File improperly formed.");
-			input.close();
-			System.exit(1);
-		}//end catch
-		catch( IllegalStateException stateException){
-			System.err.println( "Error reading from file.");
-			input.close();
-			System.exit(1);
-		}//end catch
-		
-		//Process Stream
-		int t1m = 25;
-		int t1n = 401;
-		int t2m = 10;
-		int t2n = 26;
-		Theta1 = new Matrix(t1m,t1n);
-		
-		int count = 0;
-		for (int i = 0;i<t1m;i++){
-			for (int j=0;j<t1n;j++){
-				Theta1.set(i, j, t1Temp.get(count));
-				count++;
-			}//end inner for loop
-		}//end outer for loop
-		
-		Theta2 = new Matrix(t2m,t2n);
-		count = 0;
-		for (int i = 0;i<t2m;i++){
-			for (int j=0;j<t2n;j++){
-				Theta2.set(i, j, t2Temp.get(count));
-				count++;
-			}//end inner for loop
-		}//end outer for loop
-	}
-
 	/**
 	 * This method adds up all values in a matrix and then averages them all using 
 	 * getRowDimension and getColumnDimension
@@ -322,6 +261,58 @@ public class ex3 extends Applet{
 		for (int j = 0;j < yTemp.size();j++) yData.set(j, 0, yTemp.get(j));
 	}//end method readRecords
 	
+	private static void readThetas() {
+		int matrixRows = 5000;
+		int matrixCols = 400;
+		String temp1 = new String();
+		ArrayList<Double> t1Temp = new ArrayList<Double>();
+		ArrayList<Double> t2Temp = new ArrayList<Double>();
+		try {
+			while (input.hasNext() ){
+				temp1 = input.next().toString();
+				if (temp1.matches("theta2"))break;
+				t1Temp.add(Double.valueOf(temp1));
+			}//end while
+			while (input.hasNext() ){
+				t2Temp.add(Double.valueOf(input.next().toString()));
+			}//end while
+		}//end try
+		catch(NoSuchElementException elementException){
+			System.err.println( "File improperly formed.");
+			input.close();
+			System.exit(1);
+		}//end catch
+		catch( IllegalStateException stateException){
+			System.err.println( "Error reading from file.");
+			input.close();
+			System.exit(1);
+		}//end catch
+		
+		//Process Stream
+		int t1m = 25;
+		int t1n = 401;
+		int t2m = 10;
+		int t2n = 26;
+		Theta1 = new Matrix(t1m,t1n);
+		
+		int count = 0;
+		for (int i = 0;i<t1m;i++){
+			for (int j=0;j<t1n;j++){
+				Theta1.set(i, j, t1Temp.get(count));
+				count++;
+			}//end inner for loop
+		}//end outer for loop
+		
+		Theta2 = new Matrix(t2m,t2n);
+		count = 0;
+		for (int i = 0;i<t2m;i++){
+			for (int j=0;j<t2n;j++){
+				Theta2.set(i, j, t2Temp.get(count));
+				count++;
+			}//end inner for loop
+		}//end outer for loop
+	}
+
 	private static void testDisplayData(double[] X){
 		
 		 //Var declerations
